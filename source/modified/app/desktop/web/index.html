@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XenoSend</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div id="splash">
+    <div class="panel">
+      <img class="logo" src="../../assets/xeno/brand/xeno_icon_256.png" alt="" onerror="this.style.display='none'" />
+      <div class="sm-word">XENOSEND</div>
+      <div class="sub">PS5 · PKG · PAYLOAD · TRAINERS</div>
+      <div class="bar"><i></i></div>
+    </div>
+  </div>
+
+  <div id="app" style="display:none">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../../assets/xeno/brand/xeno_icon_256.png" alt="" onerror="this.style.display='none'" />
+        <div>
+          <div class="wordmark">XENOSEND</div>
+          <div class="ver" id="brandVer">v—</div>
+        </div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-foot">
+        <span class="dot" id="connDot"></span>
+        <span class="status-txt" id="connStatus">Not connected</span>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div class="page-title" id="pageTitle">Home</div>
+        <div class="spacer"></div>
+        <div class="conn-chip">
+          <span>🎮</span>
+          <input id="ipInput" class="ip" placeholder="PS5 IP" spellcheck="false" />
+          <span style="color:var(--border-strong)">:</span>
+          <input id="portInput" class="port" placeholder="9021" spellcheck="false" />
+          <span class="btn ghost" style="padding:4px 8px" id="discoverBtn" title="Find PS5">🔍</span>
+        </div>
+      </div>
+      <div class="screen" id="screen"></div>
+    </main>
+  </div>
+
+  <div id="toasts"></div>
+  <script src="js/app.js"></script>
+</body>
+</html>

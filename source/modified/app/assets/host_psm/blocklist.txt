@@ -1,0 +1,3 @@
+# Edite: 1 item por linha. Exemplos: youtube.com | google.com
+# A GUI gera A/AAAA automaticamente.
+youtube.com

@@ -1,0 +1,1104 @@
+#:kivy 2.1.0
+#:import dp kivy.metrics.dp
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:set PAYLOAD_FOLDER_DIVIDER_RATIO 0.65
+
+<PayloadMenuItem@OneLineListItem>:
+    height: dp(44)
+    on_size:
+        self.ids._lbl_primary.font_size = "14sp"
+        self.ids._lbl_primary.text_size = self.size
+        self.ids._lbl_primary.halign = "center"
+        self.ids._lbl_primary.valign = "middle"
+
+
+<PayloadFolderMenuItem@OneLineListItem>:
+    height: dp(44)
+    on_size:
+        self.ids._lbl_primary.font_size = "14sp"
+        self.ids._lbl_primary.text_size = self.size
+        self.ids._lbl_primary.halign = "center"
+        self.ids._lbl_primary.valign = "middle"
+        self.ids._lbl_primary.markup = True
+    canvas.after:
+        Color:
+            rgba: app.theme.accent
+        Rectangle:
+            pos: self.center_x - ((self.width * PAYLOAD_FOLDER_DIVIDER_RATIO) / 2), self.y
+            size: self.width * PAYLOAD_FOLDER_DIVIDER_RATIO, dp(1)
+
+
+<PayloadFolderActionItem>:
+    size_hint_y: None
+    height: dp(44)
+    anchor_x: "center"
+    anchor_y: "center"
+
+    canvas.after:
+        Color:
+            rgba: app.theme.accent
+        Rectangle:
+            pos: self.center_x - ((self.width * PAYLOAD_FOLDER_DIVIDER_RATIO) / 2), self.y
+            size: self.width * PAYLOAD_FOLDER_DIVIDER_RATIO, dp(1)
+
+    MDBoxLayout:
+        orientation: "horizontal"
+        size_hint: None, None
+        width: self.minimum_width
+        height: dp(24)
+        spacing: dp(6)
+
+        MDIcon:
+            icon: "folder-outline"
+            theme_text_color: "Custom"
+            text_color: app.theme.accent
+            size_hint: None, None
+            size: dp(20), dp(20)
+            font_size: "20sp"
+            pos_hint: {"center_y": 0.55}
+
+        MDLabel:
+            text: root.text
+            markup: True
+            theme_text_color: "Custom"
+            text_color: app.theme.text_primary
+            size_hint: None, None
+            width: self.texture_size[0]
+            height: dp(24)
+            font_size: "14sp"
+            halign: app.tr.start
+            valign: "middle"
+            text_size: None, self.height
+
+
+<PayloadLocalMenuItem@OneLineListItem>:
+    height: dp(44)
+    on_size:
+        self.ids._lbl_primary.font_size = "14sp"
+        self.ids._lbl_primary.text_size = self.size
+        self.ids._lbl_primary.halign = "center"
+        self.ids._lbl_primary.valign = "middle"
+        self.ids._lbl_primary.markup = True
+
+
+# Linha tocável do aviso de atualização (banner entre o cabeçalho e o ScrollView).
+<UpdateBannerRow@ButtonBehavior+MDBoxLayout>:
+    orientation: "horizontal"
+    spacing: dp(6)
+
+
+<MainScreen>:
+    md_bg_color: 0, 0, 0, 0
+    # Page background: vertical gradient texture supplied by the active theme.
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            texture: app.theme.bg_texture
+
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: 0
+        spacing: 0
+
+        # Cabeçalho: geometria aprovada, com acabamento visual refinado.
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(6)
+            spacing: dp(2)
+            size_hint_y: None
+            height: self.minimum_height
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    texture: app.theme.header_texture
+            canvas.after:
+                Color:
+                    rgba: app.theme.surface_border
+                Rectangle:
+                    pos: self.x, self.y
+                    size: self.width, dp(1)
+
+            MDBoxLayout:
+                size_hint_y: None
+                height: dp(36)
+                padding: dp(4), 0, dp(4), 0
+                spacing: dp(2)
+
+                MDIconButton:
+                    icon: "folder-network-outline"
+                    disabled: True
+                    theme_text_color: "Custom"
+                    text_color: app.theme.text_primary
+                    disabled_color: app.theme.text_primary
+                    size_hint: None, None
+                    size: dp(32), dp(32)
+                    icon_size: "24sp"
+                    pos_hint: {"center_y": 0.5}
+
+                MDLabel:
+                    text: "PS5 Send [color=#F38B1A]PKG[/color] / [color=#F38B1A]Payload[/color]"
+                    markup: True
+                    font_size: "22sp"
+                    bold: True
+                    theme_text_color: "Custom"
+                    text_color: app.theme.text_primary
+                    halign: "center"
+                    valign: "middle"
+                    text_size: self.size
+                    shorten: True
+                    shorten_from: "center"
+
+                # Configurações: idioma e tema de fundo.
+                PremiumIconButton:
+                    icon: "cog-outline"
+                    on_release: app.open_settings()
+                    theme_text_color: "Custom"
+                    text_color: app.theme.accent if self.hovered else app.theme.text_primary
+                    disabled_color: app.theme.text_primary
+                    size_hint: None, None
+                    size: dp(32), dp(32)
+                    icon_size: "24sp"
+                    pos_hint: {"center_y": 0.5}
+
+        # Aviso de nova versão disponível (GitHub releases do próprio SendPP).
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: dp(32) if (root.update_available and not root.update_dismissed) else 0
+            opacity: 1 if (root.update_available and not root.update_dismissed) else 0
+            disabled: not (root.update_available and not root.update_dismissed)
+            padding: dp(10), 0, dp(4), 0
+            spacing: dp(4)
+            canvas.before:
+                Color:
+                    rgba: app.theme.accent[0], app.theme.accent[1], app.theme.accent[2], 0.16
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            canvas.after:
+                Color:
+                    rgba: app.theme.accent
+                Rectangle:
+                    pos: self.x, self.y
+                    size: self.width, dp(1)
+
+            UpdateBannerRow:
+                size_hint_x: 1
+                on_release: root.open_update_url()
+
+                MDIcon:
+                    icon: "cloud-download-outline"
+                    theme_text_color: "Custom"
+                    text_color: app.theme.accent
+                    size_hint: None, None
+                    size: dp(18), dp(18)
+                    font_size: "18sp"
+                    pos_hint: {"center_y": 0.5}
+
+                MDLabel:
+                    text: app.tr._(root.update_banner_text)
+                    theme_text_color: "Custom"
+                    text_color: app.theme.text_primary
+                    font_size: "12sp"
+                    halign: app.tr.start
+                    valign: "middle"
+                    text_size: self.size
+                    shorten: True
+                    shorten_from: "right"
+
+            MDIconButton:
+                icon: "close"
+                on_release: root.update_dismissed = True
+                theme_text_color: "Custom"
+                text_color: app.theme.text_primary
+                size_hint: None, None
+                size: dp(26), dp(26)
+                icon_size: "16sp"
+                pos_hint: {"center_y": 0.5}
+
+        # Somente funções implementadas aparecem nesta etapa.
+        ScrollView:
+            id: content_scroll
+            do_scroll_x: False
+            do_scroll_y: True
+            scroll_y: 1
+            bar_width: 0
+
+            MDBoxLayout:
+                orientation: "vertical"
+                size_hint_y: None
+                height: max(self.minimum_height, content_scroll.height)
+                padding: dp(10)
+                spacing: dp(10)
+
+                # Função 01: descoberta do PS5. Geometria funcional preservada.
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.busy else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: self.minimum_height
+
+                    MDLabel:
+                        text: app.tr._("Conexão PS5")
+                        bold: True
+                        font_size: "12sp"
+                        theme_text_color: "Custom"
+                        text_color: app.theme.accent
+                        halign: app.tr.start
+                        size_hint_y: None
+                        height: dp(16)
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        spacing: dp(6)
+                        size_hint_y: None
+                        height: dp(40)
+
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            size_hint_x: 0.72
+                            spacing: dp(2)
+
+                            MDLabel:
+                                text: app.tr._("IP do PS5")
+                                font_size: "12sp"
+                                halign: app.tr.start
+                                text_size: self.size
+                                theme_text_color: "Custom"
+                                text_color: app.theme.text_muted
+                                size_hint_y: None
+                                height: dp(12)
+
+                            MDCard:
+                                radius: [dp(10), dp(10), dp(10), dp(10)]
+                                md_bg_color: app.theme.input
+                                elevation: 0
+                                size_hint_y: None
+                                height: dp(28)
+                                padding: dp(8), 0
+
+                                TextInput:
+                                    id: host_input
+                                    text: root.host_text
+                                    on_text: root.host_text = self.text
+                                    hint_text: "192.168.0.100"
+                                    multiline: False
+                                    background_color: 0, 0, 0, 0
+                                    foreground_color: app.theme.text_primary
+                                    hint_text_color: app.theme.text_muted
+                                    cursor_color: app.theme.accent
+                                    selection_color: app.theme.accent[0], app.theme.accent[1], app.theme.accent[2], 0.28
+                                    font_size: "14sp"
+                                    padding: [0, dp(4), 0, 0]
+
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            size_hint_x: 0.28
+                            spacing: dp(2)
+
+                            MDLabel:
+                                text: app.tr._("Porta")
+                                font_size: "11sp"
+                                halign: app.tr.start
+                                text_size: self.size
+                                theme_text_color: "Custom"
+                                text_color: app.theme.text_muted
+                                size_hint_y: None
+                                height: dp(12)
+
+                            MDCard:
+                                radius: [dp(10), dp(10), dp(10), dp(10)]
+                                md_bg_color: app.theme.input
+                                elevation: 0
+                                size_hint_y: None
+                                height: dp(28)
+                                padding: dp(8), 0
+
+                                TextInput:
+                                    id: port_input
+                                    text: root.port_text
+                                    on_text: root.port_text = self.text
+                                    input_filter: "int"
+                                    multiline: False
+                                    background_color: 0, 0, 0, 0
+                                    foreground_color: app.theme.text_primary
+                                    cursor_color: app.theme.accent
+                                    selection_color: app.theme.accent[0], app.theme.accent[1], app.theme.accent[2], 0.28
+                                    font_size: "14sp"
+                                    padding: [0, dp(4), 0, 0]
+
+                    PremiumRaisedButton:
+                        text: app.tr._("Buscando...") if root.busy else app.tr._("Buscar PS5 na rede")
+                        on_release: root.start_discovery()
+                        disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                        size_hint_x: 1
+                        size_hint_y: None
+                        height: dp(30)
+                        md_bg_color: app.theme.accent_pressed if self.state == "down" else (app.theme.accent_hover if self.hovered else app.theme.accent)
+                        text_color: app.theme.button_text
+                        font_size: "13sp"
+                        elevation: 0
+
+                    # Área de estado sempre reservada: o card nunca muda de altura.
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.busy else root.status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+                # Função 02: Host local — WebKit + ReLapse + instalador, iniciado e parado explicitamente.
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.host_psm_busy or root.host_psm_running else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: dp(90)
+
+                    MDBoxLayout:
+                        size_hint_y: None
+                        height: dp(16)
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: app.tr._("Host Local")
+                            bold: True
+                            font_size: "12sp"
+                            size_hint_x: None
+                            width: self.texture_size[0]
+                            theme_text_color: "Custom"
+                            text_color: app.theme.accent
+                            halign: app.tr.start
+                            valign: "middle"
+                            text_size: None, self.height
+
+                        MDLabel:
+                            text: app.tr._("Não feche até a instalação terminar") if root.host_psm_connected else app.tr._("Não conectado")
+                            font_size: "11sp" if root.host_psm_connected else "12sp"
+                            theme_text_color: "Custom"
+                            text_color: "#FF0000" if root.host_psm_connected else app.theme.text_muted
+                            halign: app.tr.end
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+                    Widget:
+                        size_hint_y: None
+                        height: dp(2)
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(30)
+
+                        PremiumRaisedButton:
+                            id: host_psm_button
+                            text: app.tr._("Iniciando...") if root.host_psm_busy and not root.host_psm_running else (app.tr._("Parando...") if root.host_psm_busy else (app.tr._("Parar Host local") if root.host_psm_running else app.tr._("Iniciar Host local")))
+                            on_release: root.toggle_host_psm()
+                            disabled: root.host_psm_busy or ((root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy) and not root.host_psm_running)
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.text_primary if root.host_psm_busy else (app.theme.danger if root.host_psm_running else app.theme.success)
+                            font_size: "12sp"
+                            elevation: 0
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.host_psm_status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.host_psm_busy else root.host_psm_status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+
+                # Função 03: PKGs — selecionar, enviar e instalar no PS5.
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.pkg_busy else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: dp(90)
+
+                    MDBoxLayout:
+                        size_hint_y: None
+                        height: dp(16)
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: app.tr._("PKGs")
+                            bold: True
+                            font_size: "12sp"
+                            theme_text_color: "Custom"
+                            text_color: app.theme.accent
+                            halign: app.tr.start
+                            valign: "middle"
+                            text_size: self.size
+
+                    Widget:
+                        size_hint_y: None
+                        height: dp(2)
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(30)
+
+                        PremiumRaisedButton:
+                            id: pkg_select_button
+                            text: app.tr._("Selecionar PKG")
+                            on_release: root.open_pkg_menu(self)
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.pkg_status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.pkg_busy else root.pkg_status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+                # Função 04: Payloads — selecionar, enviar e executar via loader TCP.
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.payload_busy else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: dp(90)
+
+                    # Mesma geometria vertical do cabeçalho aprovado do card 2.
+                    MDBoxLayout:
+                        size_hint_y: None
+                        height: dp(16)
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: app.tr._("Payloads")
+                            bold: True
+                            font_size: "12sp"
+                            theme_text_color: "Custom"
+                            text_color: app.theme.accent
+                            halign: app.tr.start
+                            valign: "middle"
+                            text_size: self.size
+
+                    Widget:
+                        size_hint_y: None
+                        height: dp(2)
+
+                    # Mesma linha de ação de 30dp do card 2.
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(30)
+
+                        PremiumRaisedButton:
+                            id: payload_select_button
+                            text: app.tr._("Selecionar payload")
+                            on_release: root.open_payload_menu(self)
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                    # Mesmo rodapé/status aprovado dos cards anteriores.
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.payload_status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.payload_busy else root.payload_status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+                # Função 06: Atualizações YouTube — aplica download0.dat via FTPsrv em /user/download/PPSA01650.
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.youtube_update_busy else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: dp(90)
+
+                    MDBoxLayout:
+                        size_hint_y: None
+                        height: dp(16)
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: app.tr._("Atualizações [color=#FF0000]YouTube[/color] (PPSA01650)")
+                            markup: True
+                            bold: True
+                            font_size: "12sp"
+                            theme_text_color: "Custom"
+                            text_color: app.theme.text_primary
+                            halign: "left"
+                            valign: "middle"
+                            text_size: self.size
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        spacing: dp(6)
+                        size_hint_y: None
+                        height: dp(36)
+
+                        PremiumRaisedButton:
+                            id: youtube_update_select_button
+                            text: app.tr._("Selecionar update")
+                            on_release: root.open_youtube_update_menu(self)
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                            size_hint_x: 0.62
+                            size_hint_y: None
+                            height: dp(30)
+                            pos_hint: {"center_y": 0.5}
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            spacing: dp(2)
+                            size_hint_x: 0.38
+                            size_hint_y: None
+                            height: dp(36)
+
+                            MDLabel:
+                                text: app.tr._("Simular uma conta ativa")
+                                theme_text_color: "Custom"
+                                text_color: app.theme.text_muted
+                                font_size: "10sp"
+                                halign: "center"
+                                valign: "middle"
+                                text_size: self.size
+                                size_hint_y: None
+                                height: dp(12)
+                                shorten: True
+                                shorten_from: "right"
+
+                            PremiumRaisedButton:
+                                id: youtube_account_activation_button
+                                text: app.tr._("Ativar")
+                                on_release: root.start_youtube_account_activation()
+                                disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                                size_hint_x: 1
+                                size_hint_y: None
+                                height: dp(22)
+                                md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                                text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                                font_size: "12sp"
+                                elevation: 0
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.youtube_update_status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.youtube_update_busy else root.youtube_update_status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+
+
+
+                # Função 05: Y2JB Backup. Compacto, estável e com status reservado.
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.backup_busy else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: dp(90)
+
+                    MDBoxLayout:
+                        size_hint_y: None
+                        height: dp(16)
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: app.tr._(("[color=#FF3B30]Y2JB[/color] Backup " + root.backup_version_text).strip())
+                            markup: True
+                            bold: True
+                            font_size: "12sp"
+                            theme_text_color: "Custom"
+                            text_color: app.theme.text_primary
+                            halign: app.tr.start
+                            valign: "middle"
+                            text_size: self.size
+
+                        MDLabel:
+                            text: app.tr._("by Gezine")
+                            font_size: "11sp"
+                            theme_text_color: "Custom"
+                            text_color: app.theme.text_muted
+                            halign: app.tr.end
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+                    Widget:
+                        size_hint_y: None
+                        height: dp(2)
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        spacing: dp(6)
+                        size_hint_y: None
+                        height: dp(30)
+
+                        PremiumRaisedButton:
+                            text: "4.03–12.40"
+                            on_release: root.start_y2jb_backup("fw_4_03_12_40")
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                        PremiumRaisedButton:
+                            text: "12.60+"
+                            on_release: root.start_y2jb_backup("fw_12_60_up")
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.backup_status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.backup_busy else root.backup_status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+                # Função 07: Trainers — catálogo de cheats PS5 + CheatRunner (ao vivo quando alcançável).
+                MDCard:
+                    orientation: "vertical"
+                    radius: [dp(12), dp(10), dp(12), dp(12)]
+                    md_bg_color: app.theme.surface_active if root.trainer_busy else app.theme.surface
+                    elevation: 3
+                    padding: dp(6)
+                    spacing: dp(4)
+                    size_hint_y: None
+                    height: dp(124)
+
+                    MDBoxLayout:
+                        size_hint_y: None
+                        height: dp(16)
+                        spacing: dp(8)
+
+                        MDLabel:
+                            text: app.tr._("Trainers")
+                            bold: True
+                            font_size: "12sp"
+                            theme_text_color: "Custom"
+                            text_color: app.theme.accent
+                            halign: app.tr.start
+                            valign: "middle"
+                            text_size: self.size
+
+                    Widget:
+                        size_hint_y: None
+                        height: dp(2)
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(30)
+
+                        PremiumRaisedButton:
+                            id: trainer_browse_button
+                            text: app.tr._("Procurar Trainers")
+                            on_release: root.open_trainer_browser(self)
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy or root.trainer_busy
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(30)
+
+                        PremiumRaisedButton:
+                            id: trainer_auto_load_button
+                            text: app.tr._("Carregar kstuff + CheatRunner")
+                            on_release: root.start_trainer_auto_load()
+                            disabled: root.busy or root.backup_busy or root.payload_busy or root.youtube_update_busy or root.pkg_busy or root.host_psm_busy or root.trainer_busy
+                            size_hint_x: 1
+                            size_hint_y: None
+                            height: dp(30)
+                            md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                            text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                            font_size: "12sp"
+                            elevation: 0
+
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(18)
+
+                        MDLabel:
+                            text: app.tr._(root.trainer_status_text)
+                            theme_text_color: "Custom"
+                            halign: app.tr.start
+                            text_color: app.theme.text_primary if root.trainer_busy else root.trainer_status_color
+                            font_size: "12sp"
+                            valign: "middle"
+                            text_size: self.size
+                            shorten: True
+                            shorten_from: "right"
+
+
+                Widget:
+                    size_hint_y: 1
+
+        # Assinatura do projeto — padrão do app original.
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: dp(18)
+            padding: dp(8), 0, dp(8), 0
+            canvas.before:
+                Color:
+                    rgba: app.theme.footer
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            canvas.after:
+                Color:
+                    rgba: app.theme.surface_border
+                Rectangle:
+                    pos: self.x, self.top - dp(1)
+                    size: self.width, dp(1)
+
+            MDLabel:
+                text: "PSMacedo - Send PKG/Payload v" + app.app_version
+                theme_text_color: "Custom"
+                text_color: app.theme.text_muted
+                font_size: "10sp"
+                halign: app.tr.end
+                valign: "middle"
+                text_size: self.size
+                opacity: 1
+
+
+# ---------------------------------------------------------------------------
+# Configurações: idioma e tema de fundo.
+# ---------------------------------------------------------------------------
+<SettingsOptionItem>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: dp(46)
+    padding: dp(16), 0, dp(14), 0
+    spacing: dp(12)
+    canvas.before:
+        Color:
+            rgba: app.theme.control_pressed if self.state == "down" else (app.theme.surface_active if root.selected else (0, 0, 0, 0))
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    canvas.after:
+        Color:
+            rgba: app.theme.surface_border
+        Rectangle:
+            pos: self.x + dp(16), self.y
+            size: self.width - dp(32), dp(1)
+
+    # Theme preview: page colour with a small card and an accent bar on top of it.
+    Widget:
+        size_hint: None, None
+        size: (dp(34), dp(24)) if root.swatch_bg[3] > 0 else (0, 0)
+        pos_hint: {"center_y": 0.5}
+        canvas:
+            Color:
+                rgba: root.swatch_bg
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+                radius: [dp(6)]
+            Color:
+                rgba: root.swatch_surface
+            RoundedRectangle:
+                pos: self.x + dp(5), self.y + dp(5)
+                size: self.width - dp(10), self.height - dp(10)
+                radius: [dp(3)]
+            Color:
+                rgba: (app.theme.accent[0], app.theme.accent[1], app.theme.accent[2], root.swatch_bg[3])
+            Rectangle:
+                pos: self.x + dp(8), self.top - dp(10)
+                size: dp(12), dp(2)
+
+    MDLabel:
+        text: app.tr._(root.text) if root.translate else root.text
+        font_name: root.font_family or "Roboto"
+        font_size: "15sp"
+        theme_text_color: "Custom"
+        text_color: app.theme.accent if root.selected else app.theme.text_primary
+        halign: "left"
+        valign: "middle"
+        text_size: self.size
+        shorten: True
+        shorten_from: "right"
+
+    MDIcon:
+        icon: "check"
+        theme_text_color: "Custom"
+        text_color: app.theme.accent
+        opacity: 1 if root.selected else 0
+        size_hint: None, None
+        size: dp(22), dp(22)
+        font_size: "22sp"
+        pos_hint: {"center_y": 0.5}
+
+
+<SettingsModal>:
+    size_hint: 0.92, 0.88
+    auto_dismiss: True
+    background_color: 0, 0, 0, 0
+
+    MDCard:
+        orientation: "vertical"
+        radius: [dp(14), dp(14), dp(14), dp(14)]
+        md_bg_color: app.theme.surface
+        elevation: 8
+        padding: 0
+        spacing: 0
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: dp(52)
+            padding: dp(16), 0, dp(6), 0
+            canvas.after:
+                Color:
+                    rgba: app.theme.surface_border
+                Rectangle:
+                    pos: self.x, self.y
+                    size: self.width, dp(1)
+
+            MDLabel:
+                text: app.tr._("Configurações")
+                bold: True
+                font_size: "18sp"
+                theme_text_color: "Custom"
+                text_color: app.theme.text_primary
+                halign: app.tr.start
+                valign: "middle"
+                text_size: self.size
+
+            MDIconButton:
+                icon: "close"
+                theme_text_color: "Custom"
+                text_color: app.theme.text_primary
+                pos_hint: {"center_y": 0.5}
+                on_release: root.dismiss()
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            bar_width: dp(2)
+            bar_color: app.theme.accent
+            bar_inactive_color: app.theme.surface_border
+
+            MDBoxLayout:
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                padding: 0, dp(10), 0, dp(10)
+
+                MDLabel:
+                    text: app.tr._("Idioma")
+                    bold: True
+                    font_size: "12sp"
+                    theme_text_color: "Custom"
+                    text_color: app.theme.accent
+                    halign: app.tr.start
+                    valign: "middle"
+                    text_size: self.width - dp(32), self.height
+                    padding: dp(16), 0
+                    size_hint_y: None
+                    height: dp(28)
+
+                MDBoxLayout:
+                    id: language_list
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+
+                MDLabel:
+                    text: app.tr._("Tema de fundo")
+                    bold: True
+                    font_size: "12sp"
+                    theme_text_color: "Custom"
+                    text_color: app.theme.accent
+                    halign: app.tr.start
+                    valign: "middle"
+                    text_size: self.width - dp(32), self.height
+                    padding: dp(16), 0
+                    size_hint_y: None
+                    height: dp(40)
+
+                MDBoxLayout:
+                    id: theme_list
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+
+                MDLabel:
+                    text: app.tr._("Atualizações")
+                    bold: True
+                    font_size: "12sp"
+                    theme_text_color: "Custom"
+                    text_color: app.theme.accent
+                    halign: app.tr.start
+                    valign: "middle"
+                    text_size: self.width - dp(32), self.height
+                    padding: dp(16), 0
+                    size_hint_y: None
+                    height: dp(40)
+
+                MDBoxLayout:
+                    orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(56)
+                    padding: dp(16), dp(4)
+                    spacing: dp(10)
+
+                    MDLabel:
+                        text: app.tr._(app.root.update_check_status_text) if app.root.update_check_status_text else app.tr._("Verifica se há uma versão mais nova do sendpp.")
+                        font_size: "11sp"
+                        theme_text_color: "Custom"
+                        text_color: app.theme.text_muted
+                        halign: app.tr.start
+                        valign: "middle"
+                        text_size: self.size
+                        shorten: True
+                        shorten_from: "right"
+
+                    PremiumRaisedButton:
+                        text: app.tr._("Verificar agora")
+                        on_release: app.root.check_for_updates_now()
+                        size_hint: None, None
+                        size: dp(120), dp(32)
+                        pos_hint: {"center_y": 0.5}
+                        md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                        text_color: app.theme.accent if self.hovered or self.state == "down" else app.theme.text_primary
+                        font_size: "12sp"
+                        elevation: 0
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: dp(54)
+            padding: dp(12), dp(9), dp(12), dp(9)
+            canvas.before:
+                Color:
+                    rgba: app.theme.surface_border
+                Rectangle:
+                    pos: self.x, self.top - dp(1)
+                    size: self.width, dp(1)
+
+            PremiumRaisedButton:
+                text: app.tr._("Fechar")
+                on_release: root.dismiss()
+                size_hint_x: 1
+                size_hint_y: None
+                height: dp(36)
+                md_bg_color: app.theme.control_pressed if self.state == "down" else (app.theme.control_hover if self.hovered else app.theme.control)
+                text_color: app.theme.text_primary
+                font_size: "13sp"
+                elevation: 0

@@ -1,0 +1,24 @@
+# Build/venv artifacts — not part of the source
+__pycache__/
+*.pyc
+*.pyo
+.kivy/
+*.spec.bak
+
+# Never commit signing material
+*.p12
+*.pfx
+*.jks
+*.keystore
+signing-key/
+
+# Built binaries ship via GitHub Releases, not the repo
+*.exe
+*.apk
+*.ipa
+
+# Local scratch
+*.part
+*.tmp
+.DS_Store
+Thumbs.db
